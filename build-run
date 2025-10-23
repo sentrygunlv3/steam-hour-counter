@@ -1,0 +1,8 @@
+#!/bin/zsh
+set -e
+
+zig build
+
+echo running:
+
+./zig-out/bin/shc
