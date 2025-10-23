@@ -47,7 +47,7 @@ pub fn main() !void {
 			var env_map = try std.process.getEnvMap(allocator);
 			defer env_map.deinit();
 
-			try env_map.put("SteamAppId", "440");
+			try env_map.put("SteamAppId", "365670");
 
 			var sub = Child.init(
 				&[_][]const u8{subprocess_path},
