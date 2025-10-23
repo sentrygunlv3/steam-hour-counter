@@ -1,7 +1,6 @@
 const std = @import("std");
 const print = std.debug.print;
 const Child = std.process.Child;
-const fs = std.fs;
 
 var running = true;
 var subprocesses: std.StringHashMap(Child) = undefined;
