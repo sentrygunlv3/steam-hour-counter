@@ -6,9 +6,9 @@ pub fn build(b: *std.Build) void {
 		.root_module = b.createModule(.{
 			.root_source_file = b.path("src/subprocess/main.zig"),
 			.target = b.graph.host,
+			.link_libc = true,
 		}),
 	});
-	sub.linkLibC();
 
 	const exe = b.addExecutable(.{
 		.name = "shc",
@@ -17,7 +17,6 @@ pub fn build(b: *std.Build) void {
 			.target = b.graph.host,
 		}),
 	});
-	exe.linkLibC();
 
 	b.installArtifact(sub);
 	b.installArtifact(exe);

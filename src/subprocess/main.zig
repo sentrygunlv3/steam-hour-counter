@@ -6,7 +6,7 @@ pub fn main() !void {
 
 	const exe_path = try std.fs.selfExePathAlloc(allocator);
 	defer allocator.free(exe_path);
-	
+
 	const dir = std.fs.path.dirname(exe_path).?;
 
 	const lib_path = try std.fs.path.join(allocator, &[_][]const u8{dir, "libsteam_api.so"});
@@ -17,7 +17,14 @@ pub fn main() !void {
 
 	const SteamAPI_Init = steam_api.lookup(*const fn () callconv(.c) bool, "SteamAPI_Init") orelse return;
 
-	_ = SteamAPI_Init();
+	if (!SteamAPI_Init()) {
+		while (true) {
+			std.Thread.sleep(10 * std.time.ms_per_min);
+			if (SteamAPI_Init()) {
+				break;
+			}
+		}
+	}
 
 	while (true) {
 		std.Thread.sleep(std.time.ms_per_hour);
