@@ -14,7 +14,7 @@ pub fn main() !void {
 
 	if (!SteamAPI_Init()) {
 		while (true) {
-			std.Thread.sleep(10 * std.time.ms_per_min);
+			std.Thread.sleep(5 * std.time.ms_per_min);
 			if (SteamAPI_Init()) {
 				break;
 			}

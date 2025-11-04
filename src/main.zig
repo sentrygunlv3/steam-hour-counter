@@ -44,8 +44,6 @@ pub fn main() !void {
 	try programs.put("godot", "404790");
 
 	while (running) {
-		std.Thread.sleep(5 * std.time.ns_per_s);
-
 		var iterator = programs.iterator();
 		while (iterator.next()) |item| {
 			const proc = try Child.run(.{
@@ -81,6 +79,7 @@ pub fn main() !void {
 				print("killed subprocess for {s}\n", .{item.key_ptr.*});
 			}
 		}
+		std.Thread.sleep(15 * std.time.ns_per_s);
 	}
 	cleanup();
 }
