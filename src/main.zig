@@ -36,10 +36,6 @@ pub fn main() !void {
 	var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 	const allocator = gpa.allocator();
 
-	const exe_path = try std.fs.selfExePathAlloc(allocator);
-	defer allocator.free(exe_path);
-	const subprocess_path = try std.fmt.allocPrint(allocator, "{s}-sub", .{exe_path});
-
 	subprocesses = std.StringHashMap(Child).init(allocator);
 
 	var programs = std.StringHashMap([]const u8).init(allocator);
@@ -68,7 +64,7 @@ pub fn main() !void {
 				try env_map.put("SteamAppId", item.value_ptr.*);
 
 				var sub = Child.init(
-					&[_][]const u8{subprocess_path},
+					&[_][]const u8{"/usr/lib/steam-hour-counter/shc-sub"},
 					allocator
 				);
 				sub.env_map = &env_map;

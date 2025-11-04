@@ -11,7 +11,7 @@ pub fn build(b: *std.Build) void {
 	});
 
 	const exe = b.addExecutable(.{
-		.name = "shc",
+		.name = "steam-hour-counter",
 		.root_module = b.createModule(.{
 			.root_source_file = b.path("src/main.zig"),
 			.target = b.graph.host,

@@ -1,0 +1,20 @@
+#!/bin/zsh
+set -e
+
+if [[ ! -e libsteam_api.so ]]; then
+    echo "add the libsteam_api.so file to the project root"
+    exit 1
+fi
+
+zig build
+
+cp zig-out/bin/steam-hour-counter /usr/bin/steam-hour-counter
+
+if [[ ! -d /usr/lib/steam-hour-counter ]]; then
+    mkdir /usr/lib/steam-hour-counter
+fi
+
+cp zig-out/bin/shc-sub /usr/lib/steam-hour-counter/shc-sub
+cp libsteam_api.so /usr/lib/steam-hour-counter/libsteam_api.so
+
+cp steam-hour-counter.service /usr/lib/systemd/user/steam-hour-counter.service

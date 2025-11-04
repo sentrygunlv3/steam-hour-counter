@@ -5,4 +5,4 @@ zig build
 
 echo running:
 
-./zig-out/bin/shc
+./zig-out/bin/steam-hour-counter

@@ -1,0 +1,11 @@
+[Unit]
+Description=steam hour counter for non steam programs
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/steam-hour-counter
+Restart=on-failure
+StandardOutput=file:%h/log_file
+
+[Install]
+WantedBy=default.target
