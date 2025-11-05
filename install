@@ -18,3 +18,5 @@ cp zig-out/bin/shc-sub /usr/lib/steam-hour-counter/shc-sub
 cp libsteam_api.so /usr/lib/steam-hour-counter/libsteam_api.so
 
 cp steam-hour-counter.service /usr/lib/systemd/user/steam-hour-counter.service
+
+cp steam-hour-counter /home/$SUDO_USER/.config/steam-hour-counter

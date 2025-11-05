@@ -5,6 +5,7 @@ Description=steam hour counter for non steam programs
 Type=simple
 ExecStart=/usr/bin/steam-hour-counter
 Restart=on-failure
+ExecReload=kill -HUP $MAINPID
 StandardOutput=file:%h/log_file
 
 [Install]

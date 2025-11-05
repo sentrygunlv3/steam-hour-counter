@@ -3,7 +3,11 @@ const print = std.debug.print;
 const Child = std.process.Child;
 const Signal = std.os.linux.SIG;
 
+const qlist = @import("qlist");
+
 var running = true;
+var update = true;
+
 var subprocesses: std.StringHashMap(Child) = undefined;
 
 fn signalHandler(signo: i32) callconv(.c) void {
@@ -16,13 +20,27 @@ fn signalHandler(signo: i32) callconv(.c) void {
 			running = false;
 		},
 		Signal.HUP => {
-			// update
+			update = true;
 		},
 		else => {},
 	}
 }
 
 pub fn main() !void {
+	var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+	const allocator = gpa.allocator();
+
+	subprocesses = std.StringHashMap(Child).init(allocator);
+	var programs = qlist.QList.init(allocator);
+
+	var env_map = try std.process.getEnvMap(allocator);
+	defer env_map.deinit();
+
+	const home_dir = env_map.get("HOME") orelse {
+		print("cant get home dir", .{});
+		return;
+	};
+
 	var sa = std.os.linux.Sigaction{
 		.handler = .{.handler = signalHandler},
 		.mask = std.os.linux.sigemptyset(),
@@ -33,18 +51,21 @@ pub fn main() !void {
 	_ = std.os.linux.sigaction(Signal.TERM, &sa, null);
 	_ = std.os.linux.sigaction(Signal.HUP, &sa, null);
 
-	var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-	const allocator = gpa.allocator();
-
-	subprocesses = std.StringHashMap(Child).init(allocator);
-
-	var programs = std.StringHashMap([]const u8).init(allocator);
-	// program name - steam id
-	try programs.put("blender", "365670");
-	try programs.put("godot", "404790");
-
 	while (running) {
-		var iterator = programs.iterator();
+		if (update) {
+			update = false;
+			print("reading config\n", .{});
+
+			const conf_path = try std.fs.path.join(allocator, &[_][]const u8{
+				home_dir, ".config", "steam-hour-counter"
+			});
+	
+			qlist.read(&programs, conf_path) catch |e| {
+				print("{}\n", .{e});
+			};
+		}
+
+		var iterator = programs.hm.iterator();
 		while (iterator.next()) |item| {
 			const proc = try Child.run(.{
 				.argv = &[_][]const u8{"pgrep", "-x", item.key_ptr.*},
@@ -56,10 +77,8 @@ pub fn main() !void {
 			var child = subprocesses.get(item.key_ptr.*);
 			if (proc.stdout.len > 0 and child == null) {
 				print("found {s}\n", .{item.key_ptr.*});
-				var env_map = try std.process.getEnvMap(allocator);
-				defer env_map.deinit();
-
-				try env_map.put("SteamAppId", item.value_ptr.*);
+				
+				try env_map.put("SteamAppId", item.value_ptr.*.string);
 
 				var sub = Child.init(
 					&[_][]const u8{"/usr/lib/steam-hour-counter/shc-sub"},

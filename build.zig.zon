@@ -1,0 +1,12 @@
+.{
+    .name = .steamhourcounter,
+    .version = "0.15.1",
+    .dependencies = .{
+        .qlist = .{
+            .url = "https://github.com/sentrygunlv3/qlist/archive/refs/tags/v0.1.0.tar.gz",
+            .hash = "qlist-0.1.0-AAAAABETAAC94KqYKdW9HEG_ir9DihZm88cjUmSu4m74",
+        },
+    },
+    .paths = .{""},
+    .fingerprint = 0x39270ff9e726423a,
+}
