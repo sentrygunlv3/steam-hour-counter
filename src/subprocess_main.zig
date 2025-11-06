@@ -1,4 +1,5 @@
 const std = @import("std");
+const l = std.log;
 
 pub fn main() !void {
 	var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -14,7 +15,8 @@ pub fn main() !void {
 
 	if (!SteamAPI_Init()) {
 		while (true) {
-			std.Thread.sleep(5 * std.time.ms_per_min);
+			l.warn("failed to init steam api, make sure steam is running", .{});
+			std.Thread.sleep(3 * std.time.ms_per_min);
 			if (SteamAPI_Init()) {
 				break;
 			}

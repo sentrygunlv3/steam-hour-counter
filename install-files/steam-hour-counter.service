@@ -6,7 +6,7 @@ Type=simple
 ExecStart=/usr/bin/steam-hour-counter
 Restart=on-failure
 ExecReload=kill -HUP $MAINPID
-StandardOutput=file:%h/log_file
+StandardOutput=journal
 
 [Install]
 WantedBy=default.target

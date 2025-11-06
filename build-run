@@ -1,6 +1,8 @@
 #!/bin/zsh
 set -e
 
+echo building:
+
 zig build
 
 echo running:
