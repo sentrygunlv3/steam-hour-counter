@@ -1,0 +1,12 @@
+#!/bin/zsh
+set -e
+
+echo uninstalling...
+
+rm /usr/bin/steam-hour-counter
+
+rm -r /usr/lib/steam-hour-counter
+
+rm /usr/lib/systemd/user/steam-hour-counter.service
+
+rm /home/$SUDO_USER/.config/steam-hour-counter
