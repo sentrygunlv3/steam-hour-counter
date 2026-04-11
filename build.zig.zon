@@ -3,7 +3,8 @@
     .version = "0.15.1",
     .dependencies = .{
         .yet = .{
-            .path = "../yet/",
+            .url = "https://github.com/sentrygunlv3/yet/archive/refs/tags/v0.1.0.tar.gz",
+            .hash = "yet-0.0.0-4zCrveA-AAAkbF_BehOtz5Ep2r5mVUj9ebzCKCJ6Abg2",
         },
     },
     .paths = .{""},
