@@ -8,7 +8,7 @@ fi
 
 echo building:
 
-zig build
+zig build -Doptimize=ReleaseFast
 
 echo installing...
 

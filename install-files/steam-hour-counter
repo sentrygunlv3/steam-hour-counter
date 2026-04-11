@@ -1,3 +1,8 @@
+/ seconds to sleep as int
+sleep 20
+
 / name - steam id
-s blender 365670
-s godot 404790
+programs {
+	blender \365670
+	godot \404790
+}

@@ -4,10 +4,10 @@ pub fn build(b: *std.Build) void {
 	const target = b.standardTargetOptions(.{});
 	const optimize = b.standardOptimizeOption(.{});
 
-	const qlist = b.dependency("qlist", .{
+	const yet = b.dependency("yet", .{
 		.target = target,
 		.optimize = optimize,
-	}).module("qlist");
+	}).module("root");
 
 	const sub = b.addExecutable(.{
 		.name = "shc-sub",
@@ -25,7 +25,7 @@ pub fn build(b: *std.Build) void {
 			.target = target,
 		}),
 	});
-	exe.root_module.addImport("qlist", qlist);
+	exe.root_module.addImport("yet", yet);
 
 	b.installArtifact(sub);
 	b.installArtifact(exe);

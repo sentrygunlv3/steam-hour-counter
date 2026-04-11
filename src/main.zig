@@ -3,7 +3,7 @@ const l = std.log;
 const Child = std.process.Child;
 const Signal = std.os.linux.SIG;
 
-const qlist = @import("qlist");
+const YET = @import("yet");
 
 var running = true;
 var update = true;
@@ -31,7 +31,8 @@ pub fn main() void {
 	const allocator = gpa.allocator();
 
 	subprocesses = std.StringHashMap(Child).init(allocator);
-	var programs = qlist.QList.init(allocator);
+	var yet: YET.YET = .init(allocator);
+	var sleep: u64 = 15 * std.time.ns_per_s;
 
 	var env_map = std.process.getEnvMap(allocator) catch |e| {
 		l.err("failed to get env map: {}", .{e});
@@ -59,6 +60,8 @@ pub fn main() void {
 			update = false;
 			l.info("reading config...", .{});
 
+			yet.deinit();
+
 			const conf_path = std.fs.path.join(allocator, &[_][]const u8{
 				home_dir, ".config", "steam-hour-counter"
 			}) catch |e| {
@@ -66,14 +69,37 @@ pub fn main() void {
 				return;
 			};
 			defer allocator.free(conf_path);
-	
-			qlist.read(&programs, conf_path) catch |e| {
-				l.err("failed to read config: {}", .{e});
+
+			const file = std.fs.cwd().readFileAlloc(allocator, conf_path, 1024*1024) catch |e| {
+				l.err("{}", .{e});
+				return;
 			};
+			defer allocator.free(file);
+
+			yet = YET.read(allocator, file) catch |e| {
+				l.err("{}", .{e});
+				return;
+			};
+			const s = yet.fields.get("sleep");
+			if (s) |field| {
+				if (field == .int) {
+					sleep = @as(u64, @intCast(field.int)) * std.time.ns_per_s;
+					std.debug.print("new sleep: {}\n", .{field.int});
+				}
+			}
 		}
 
-		var iterator = programs.hm.iterator();
-		while (iterator.next()) |item| {
+		const pro = yet.fields.get("programs") orelse {
+			l.err("no field name programs", .{});
+			return;
+		};
+		if (pro != .group) {
+			l.err("filed programs not a group", .{});
+			return;
+		}
+
+		var it = pro.group.iterator();
+		while (it.next()) |item| {
 			const proc = Child.run(.{
 				.argv = &[_][]const u8{"pgrep", "-x", item.key_ptr.*},
 				.allocator = allocator,
@@ -87,7 +113,7 @@ pub fn main() void {
 			var child = subprocesses.get(item.key_ptr.*);
 			if (proc.stdout.len > 0 and child == null) {
 				l.info("found {s}", .{item.key_ptr.*});
-				
+
 				env_map.put("SteamAppId", item.value_ptr.*.string) catch |e| {
 					l.warn("failed to add SteamAppId to env map: {}\nskipping to next program", .{e});
 					continue;
@@ -109,7 +135,7 @@ pub fn main() void {
 				l.info("killed subprocess for {s}", .{item.key_ptr.*});
 			}
 		}
-		std.Thread.sleep(15 * std.time.ns_per_s);
+		std.Thread.sleep(sleep);
 	}
 	cleanup();
 }
